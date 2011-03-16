@@ -22,7 +22,9 @@ class lighttpd
   service { "lighttpd":
     ensure => running,
     require => Package["lighttpd", "apache2.2-bin"],
-  } 
+  }
+
+  notice("Installing Lighttpd")
 }
 
 class lighttpd-phpmysql-fastcgi inherits lighttpd
@@ -42,27 +44,18 @@ class lighttpd-phpmysql-fastcgi inherits lighttpd
     require =>  Package["php5-cgi"],
   }
 
+  notice("Installing PHP5 CGI and MySQL")
 }
 
 class symfony-server inherits lighttpd-phpmysql-fastcgi
 {
-
-  package { "git-core":
-    ensure => present,
-  }
 
   package { ["php5-cli", "php5-sqlite"]:
     ensure => present,
     notify  => Service["lighttpd"],
   }
 
-  exec { "git clone git://github.com/symfony/symfony1.git":
-    path    => "/usr/bin:/usr/sbin:/bin",
-    cwd => "/var/www",
-    creates => "/var/www/symfony1",
-    require => Package["git-core", "lighttpd"],
-  }
-
+  notice("Installing PHP5 CLI and SQLite")
 }
 
 class symfony-live-server inherits symfony-server
@@ -81,7 +74,8 @@ class symfony-live-server inherits symfony-server
     notify  => Service["lighttpd"],
   }
 
+  notice("Installing and enabling Hosts file")
 }
 
 include symfony-live-server
-notice("Symfony server is live!")
+notice("Symfony2 server is going live!")
